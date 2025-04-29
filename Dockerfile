@@ -27,6 +27,7 @@ RUN echo "*** Installing Compiler Explorer ***" \
         clang-18 \
         clang-19 \
         rsync \
+        file \
     && apt-get autoremove --purge -y \
     && apt-get autoclean -y \
     && rm -rf /var/cache/apt/* /tmp/* \
