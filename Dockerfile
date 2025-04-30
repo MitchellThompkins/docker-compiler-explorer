@@ -14,20 +14,20 @@ RUN echo "*** Installing Compiler Explorer ***" \
     && apt-get install -y curl \
     && curl -sL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y \
-        wget \
         ca-certificates \
-        nodejs \
-        make \
-        git \
-        g++-9 \
-        g++-10 \
-        g++-11 \
         clang-16 \
         clang-17 \
         clang-18 \
         clang-19 \
-        rsync \
         file \
+        g++-10 \
+        g++-11 \
+        g++-9 \
+        git \
+        make \
+        nodejs \
+        rsync \
+        wget \
     && apt-get autoremove --purge -y \
     && apt-get autoclean -y \
     && rm -rf /var/cache/apt/* /tmp/* \
