@@ -5,14 +5,25 @@ LABEL maintainer="Michele Adduci <adduci@tutanota.com>" \
 
 EXPOSE 10240
 
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Make sure necessary tools are available first
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl gnupg ca-certificates
+
+# Install LLVM key in dearmor format
+RUN echo "*** Update and sign use trusted sources ***" \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg \
+    && chmod 644 /etc/apt/keyrings/llvm.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/llvm.gpg] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main" > /etc/apt/sources.list.d/llvm.list \
+    && echo "deb [signed-by=/etc/apt/keyrings/llvm.gpg] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" >> /etc/apt/sources.list.d/llvm.list \
+    && echo "deb [signed-by=/etc/apt/keyrings/llvm.gpg] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-19 main" >> /etc/apt/sources.list.d/llvm.list \
+    && apt-get update
+
+# Download the GPG key into the trusted.gpg.d directory
 RUN echo "*** Installing Compiler Explorer ***" \
-    && wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
-    && add-apt-repository -y "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main" \
-    && add-apt-repository -y "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" \
-    && add-apt-repository -y "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-19 main" \
-    && DEBIAN_FRONTEND=noninteractive apt-get update \
-    && apt-get install -y curl \
-    && curl -sL https://deb.nodesource.com/setup_20.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y \
         ca-certificates \
         clang-16 \
@@ -30,7 +41,7 @@ RUN echo "*** Installing Compiler Explorer ***" \
         wget \
     && apt-get autoremove --purge -y \
     && apt-get autoclean -y \
-    && rm -rf /var/cache/apt/* /tmp/* \
+    && rm -rf /var/lib/apt/lists/* /tmp/* \
     && git clone https://github.com/compiler-explorer/compiler-explorer.git /compiler-explorer \
     && cd /compiler-explorer \
     && echo "Add missing dependencies" \
